@@ -44,6 +44,17 @@ import cookieParser from 'cookie-parser';
 
 const app = express();
 
+const enforceHTTPS = (req, res, next) => {
+  if (req.headers['x-forwarded-proto'] !== 'https') {
+    return res.redirect(['https://', req.hostname, req.url].join(''));
+  }
+  return next();
+};
+
+// Only use this middleware in production
+if (process.env.NODE_ENV === 'production') {
+  app.use(enforceHTTPS);
+}
 // Allowed origins
 const allowedOrigins = [
   'http://localhost:5173',
